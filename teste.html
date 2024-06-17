@@ -5,6 +5,80 @@
   <!-- Usando a versão 8.x.x do Firebase, compatível com inclusão direta via <script> -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    input {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #userData, #additionalInfo {
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+
+    #userData p, #additionalInfo ul {
+      margin: 0;
+      padding: 5px 0;
+    }
+
+    h3 {
+      color: #007bff;
+      margin-top: 20px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul li {
+      background: #f9f9f9;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+  </style>
 </head>
 <body>
   <h1>Validação de Código</h1>
@@ -72,7 +146,7 @@
         let atestadosHTML = '<h3>Atestados</h3><ul>';
         atestadosSnapshot.forEach(doc => {
           const data = doc.data();
-          atestadosHTML += `<li>${data.nomeMedico} - ${data.dataEmissao} - ${data.quantidadeDias} dias</li>`;
+          atestadosHTML += `<li>${data.nomeMedico} - ${data.dataEmissao} - ${data.quantidadeDias}  - ${data.arquivoUrl} dia(s)</li>`;
         });
         atestadosHTML += '</ul>';
 
