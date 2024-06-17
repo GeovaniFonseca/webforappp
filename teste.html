@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Validate Code</title>
+  <!-- Usando a versão 8.x.x do Firebase, compatível com inclusão direta via <script> -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Validação de Código</h1>
+  <input type="text" id="codeInput" placeholder="Insira o código aqui">
+  <button onclick="validateCode()">Validar</button>
+  <div id="userData"></div>
+  <div id="additionalInfo"></div>
+
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: 'AIzaSyCkUldRq3rk-Ac_Fno_dtCL5P24W6VCmbQ',
+            appId: '1:581039158937:web:27aabdb75c638250122a08',
+            messagingSenderId: '581039158937',
+            projectId: 'projetoaplicado-2f74d',
+            authDomain: 'projetoaplicado-2f74d.firebaseapp.com',
+            storageBucket: 'projetoaplicado-2f74d.appspot.com',
+    };
+
+    // Inicialização do Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function validateCode() {
+      const code = document.getElementById('codeInput').value;
+      console.log('Código inserido:', code);
+
+      try {
+        const querySnapshot = await db.collection('Users').where('code', '==', code).get();
+        console.log('Resultado da consulta:', querySnapshot);
+
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+          console.log('Dados do usuário:', userData);
+          document.getElementById('userData').innerHTML = `
+            <p>Nome: ${userData.name}</p>
+            <p>Email: ${userData.email}</p>
+            <p>Código: ${userData.code}</p>
+            <p>Idade: ${userData.age}</p>
+            <p>Altura: ${userData.height}</p>
+            <p>Doa Sangue: ${userData.bloodDonor}</p>
+            <p>Tipo Sanguíneo: ${userData.bloodType}</p>
+            <p>Doador de Órgãos: ${userData.organDonor}</p>
+            <p>Dependentes: ${userData.dependents.join(", ")}</p>
+          `;
+
+          const userId = userDoc.id;
+          await fetchAdditionalInfo(userId);
+        } else {
+          document.getElementById('userData').innerText = 'Código inválido';
+        }
+      } catch (error) {
+        console.error('Erro ao validar o código:', error);
+        document.getElementById('userData').innerText = `Erro ao validar o código: ${error.message}`;
+      }
+    }
+
+    async function fetchAdditionalInfo(userId) {
+      try {
+        const atestadosSnapshot = await db.collection('Atestados').where('userId', '==', userId).get();
+        const vacinasSnapshot = await db.collection('Vacinas').where('userId', '==', userId).get();
+        const examesSnapshot = await db.collection('Exames').where('userId', '==', userId).get();
+
+        let atestadosHTML = '<h3>Atestados</h3><ul>';
+        atestadosSnapshot.forEach(doc => {
+          const data = doc.data();
+          atestadosHTML += `<li>${data.nomeMedico} - ${data.dataEmissao} - ${data.quantidadeDias} dias</li>`;
+        });
+        atestadosHTML += '</ul>';
+
+        let vacinasHTML = '<h3>Vacinas</h3><ul>';
+        vacinasSnapshot.forEach(doc => {
+          const data = doc.data();
+          vacinasHTML += `<li>${data.tipo} - ${data.dateAplicacao} - ${data.numeroLote || "Sem lote"}</li>`;
+        });
+        vacinasHTML += '</ul>';
+
+        let examesHTML = '<h3>Exames</h3><ul>';
+        examesSnapshot.forEach(doc => {
+          const data = doc.data();
+          examesHTML += `<li>${data.tipo} - ${data.laudo} - ${data.date}</li>`;
+        });
+        examesHTML += '</ul>';
+
+        document.getElementById('additionalInfo').innerHTML = `
+          ${atestadosHTML}
+          ${vacinasHTML}
+          ${examesHTML}
+        `;
+      } catch (error) {
+        console.error('Erro ao buscar informações adicionais:', error);
+        document.getElementById('additionalInfo').innerText = `Erro ao buscar informações adicionais: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
